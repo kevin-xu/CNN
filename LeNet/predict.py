@@ -3,15 +3,17 @@ import numpy as np
 
 import scipy as sp
 
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras.models import load_model
 
 model = load_model('model.h5')
 
-x = load_img('digit.jpg', color_mode = 'grayscale')
+x = tf.io.read_file('digit.jpg')
 
-x = img_to_array(x)
+x = tf.image.decode_jpeg(x, channels = 1)
+
+x = x.numpy()
 
 x = sp.ndimage.zoom(x, (32 / x.shape[0], 32 / x.shape[1], 1), order = 1)
 
