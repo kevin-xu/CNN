@@ -9,7 +9,7 @@ from tensorflow.keras.models import load_model
 
 model = load_model('model.h5')
 
-x = tf.io.read_file('digit.jpg')
+x = tf.io.read_file('x.jpg')
 
 x = tf.image.decode_jpeg(x, channels = 1)
 

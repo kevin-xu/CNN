@@ -93,8 +93,8 @@ model.add(Dense(10))
 model.add(Activation('softmax'))
 
 model.compile(
-        loss = 'categorical_crossentropy',
         optimizer = 'SGD',
+        loss = 'categorical_crossentropy',
         metrics = ['accuracy'])
 
 log_dir = './logs/train/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -104,11 +104,10 @@ tensorboard_callback = TensorBoard(
         histogram_freq = 1,
         write_graph = True,
         write_images = True,
+        update_freq = 'batch',
+        profile_batch = 0,
         embeddings_freq = 1,
-        embeddings_layer_names = None,
-        embeddings_metadata = None,
-        embeddings_data = None,
-        update_freq = 'batch')
+        embeddings_metadata = None)
 
 model.fit(
         x = x_train,
@@ -126,13 +125,15 @@ score = model.evaluate(
         y = y_test,
         batch_size = 128,
         verbose = 2,
+        callbacks = [tensorboard_callback],
         max_queue_size = 10,
         workers = 2,
-        use_multiprocessing = True)
+        use_multiprocessing = True,
+        return_dict = True)
 
-print(f'Test loss: {score[0]}')
+print(f'Test loss: {score["loss"]}')
 
-print(f'Test accuracy: {score[1]}')
+print(f'Test accuracy: {score["accuracy"]}')
 
 model.save('model.h5', include_optimizer = False)
 
