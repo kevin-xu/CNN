@@ -7,7 +7,9 @@ import tensorflow as tf
 
 from tensorflow.keras.models import load_model
 
-model = load_model('model.h5')
+from tensorflow.keras.activations import tanh
+
+model = load_model('model.h5', custom_objects = {'A': 1.7159, 'tanh': tanh})
 
 x = tf.io.read_file('x.jpg')
 

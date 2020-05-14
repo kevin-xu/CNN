@@ -11,11 +11,14 @@ from tensorflow.keras.utils import to_categorical
 
 from tensorflow.keras import Sequential
 
+from tensorflow.keras.activations import tanh
+
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import AveragePooling2D
-from tensorflow.keras.layers import Activation
+from tensorflow.keras.layers import Lambda
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Activation
 
 from tensorflow.keras.callbacks import TensorBoard
 
@@ -39,6 +42,10 @@ y_test = to_categorical(y_test, num_classes = 10)
 
 model = Sequential()
 
+A = 1.7159
+
+Atanh = lambda x: A * tanh(x)
+
 model.add(
         Conv2D(
             6,
@@ -55,7 +62,7 @@ model.add(
             padding = 'valid',
             data_format = 'channels_last'))
 
-model.add(Activation('relu'))
+model.add(Lambda(Atanh))
 
 model.add(
         Conv2D(
@@ -72,7 +79,7 @@ model.add(
             padding = 'valid',
             data_format = 'channels_last'))
 
-model.add(Activation('relu'))
+model.add(Lambda(Atanh))
 
 model.add(
         Conv2D(
@@ -86,7 +93,7 @@ model.add(Flatten())
 
 model.add(Dense(84))
 
-model.add(Activation('relu'))
+model.add(Lambda(Atanh))
 
 model.add(Dense(10))
 
