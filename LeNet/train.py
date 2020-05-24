@@ -122,10 +122,7 @@ model.fit(
         batch_size = 128,
         epochs = 10,
         verbose = 2,
-        callbacks = [tensorboard_callback],
-        max_queue_size = 10,
-        workers = 2,
-        use_multiprocessing = True)
+        callbacks = [tensorboard_callback])
 
 score = model.evaluate(
         x = x_test,
@@ -133,9 +130,6 @@ score = model.evaluate(
         batch_size = 128,
         verbose = 2,
         callbacks = [tensorboard_callback],
-        max_queue_size = 10,
-        workers = 2,
-        use_multiprocessing = True,
         return_dict = True)
 
 print(f'Test loss: {score["loss"]}')

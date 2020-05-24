@@ -11,7 +11,7 @@ import tensorflow as tf
 
 import tensorflow_datasets as tfds
 
-from tensorflow.keras.utils import Sequence
+from tensorflow.keras.utils import to_categorical
 
 from tensorflow.keras import Sequential
 
@@ -93,21 +93,46 @@ ds_train = (
         .prefetch(1024)
         )
 
-class XYGenerator(Sequence):
-    def __init__(self, ds, ds_size):
-        super().__init__()
+def reshape_and_concat(old_X, xy):
+    x, _ = xy
 
-        self._ds = ds
+    x = tf.reshape(x, (-1, 3))
 
-        self._ds_size = ds_size
+    return tf.concat((old_X, x), 0)
 
-    def __len__(self):
-        return self._ds_size
+X = ds_train.reduce(tf.zeros((0, 3), dtype = 'uint8'), reshape_and_concat)
 
-    def __getitem__(self, index):
-        pass
+X = tf.transpose(X)
 
-training_generator = XYGenerator(ds_train, ds_train_size)
+s, U, _ = tf.linalg.svd(X, full_matrices = True)
+
+def TrainingGenerator(ds, ds_size, batch_size, n_epochs):
+    for _ in range(n_epochs):
+        _ds = ds.shuffle(ds_size)
+
+        batched_ds = _ds.batch(batch_size)
+
+        for i, batch in enumerate(batched_ds):
+            X = tf.zeros((batch_size, 224, 224, 3))
+
+            Y = tf.zeros((batch_size,), dtype = 'int64')
+
+            for xy in batch:
+                x, y = xy
+
+                alpha = tf.random.normal((3, 1), mean = 0.0, stddev = 0.1)
+
+                delta = tf.matmul(U, alpha * s)
+
+                x = tf.cast(x, dtype = 'float32') + tf.transpose(delta)
+
+                X[i] = x
+
+                Y[i] = y
+
+            Y = to_categorical(Y, num_classes = 1000)
+
+            yield X, Y
 
 ds_test = (
         ds['test']
@@ -254,19 +279,19 @@ model.add(
 
 model.add(Flatten())
 
-model.add(Dense('4096'))
+model.add(Dense(4096))
 
 model.add(Activation('relu'))
 
 model.add(Dropout(0.5))
 
-model.add(Dense('4096'))
+model.add(Dense(4096))
 
 model.add(Activation('relu'))
 
 model.add(Dropout(0.5))
 
-model.add(Dense('1000'))
+model.add(Dense(1000))
 
 model.add(Activation('softmax'))
 
@@ -288,10 +313,18 @@ tensorboard_callback = TensorBoard(
         embeddings_data = None,
         update_freq = 'batch')
 
+training_batch_size = 128
+
+training_n_epochs = 10
+
 model.fit(
-        x = training_generator,
-        batch_size = 128,
-        epochs = 10,
+        x = TrainingGenerator(
+            ds_train,
+            ds_train_size,
+            training_batch_size,
+            training_n_epochs),
+        epochs = training_n_epochs,
+        steps_per_epoch = ds_train_size / training_batch_size,
         verbose = 2,
         callbacks = [tensorboard_callback],
         max_queue_size = 10,
