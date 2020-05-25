@@ -219,8 +219,6 @@ class LocalResponseNormalization(Layer):
 
         self._beta = beta
 
-        self._name = name
-
     def call(self, inputs, **kwargs):
         if not isinstance(inputs, tf.Tensor):
             raise TypeError
@@ -233,7 +231,7 @@ class LocalResponseNormalization(Layer):
                 bias = self._bias,
                 alpha = self._alpha,
                 beta = self._beta,
-                name = self._name)
+                name = self.name)
 
         return output
 
