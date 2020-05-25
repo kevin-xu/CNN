@@ -17,7 +17,7 @@ from tensorflow.keras import Sequential
 
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Activation
-from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import Layer
 from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dense
@@ -200,13 +200,49 @@ model.add(
 
 model.add(Activation('relu'))
 
+class LocalResponseNormalization(Layer):
+    def __init__(
+            self,
+            depth_radius = 5,
+            bias = 1.0,
+            alpha = 1.0,
+            beta = 0.5,
+            name = None,
+            **kwargs):
+        super().__init__(self, trainable = False, name = name, **kwargs)
+
+        self._depth_radius = depth_radius
+
+        self._bias = bias
+
+        self._alpha = alpha
+
+        self._beta = beta
+
+        self._name = name
+
+    def call(self, inputs, **kwargs):
+        if not isinstance(inputs, tf.Tensor):
+            raise TypeError
+
+        input_ = inputs
+
+        output = tf.nn.local_response_normalization(
+                input_,
+                depth_radius = self._depth_radius,
+                bias = self._bias,
+                alpha = self._alpha,
+                beta = self._beta,
+                name = self._name)
+
+        return output
+
 model.add(
-        BatchNormalization(
-            axis = -1,
-            momentum = 0.99,
-            epsilon = 0.001,
-            center = True,
-            scale = True))
+        LocalResponseNormalization(
+            depth_radius = 5,
+            bias = 2.0,
+            alpha = 1.0e-4,
+            beta = 0.75))
 
 model.add(
         MaxPooling2D(
@@ -226,12 +262,11 @@ model.add(
 model.add(Activation('relu'))
 
 model.add(
-        BatchNormalization(
-            axis = -1,
-            momentum = 0.99,
-            epsilon = 0.001,
-            center = True,
-            scale = True))
+        LocalResponseNormalization(
+            depth_radius = 5,
+            bias = 2.0,
+            alpha = 1.0e-4,
+            beta = 0.75))
 
 model.add(
         MaxPooling2D(
