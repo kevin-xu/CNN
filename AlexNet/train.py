@@ -36,7 +36,7 @@ ds, ds_info = tfds.load(
         with_info = True)
 
 def to_xy(example):
-    return example['image'], example['label']
+    return tf.cast(example['image'], dtype = 'float32'), example['label']
 
 def resize_and_crop_to_256x256(xy):
     x, y = xy
@@ -87,6 +87,22 @@ ds_train = (
         ds['train']
         .map(to_xy, num_parallel_calls = 8)
         .map(resize_and_crop_to_256x256, num_parallel_calls = 8)
+        )
+
+def reduce_sum(old_sum_rgb, xy):
+    x, _ = xy
+
+    x = tf.reshape(x, (-1, 3))
+
+    return old_sum_rgb + tf.reduce_sum(x, axis = 0)
+
+sum_rgb = ds_train.reduce(tf.zeros((3,)), reduce_sum)
+
+mean_activity = sum_rgb / ds_train_size
+
+ds_train = (
+        ds_train
+        .map(lambda xy: (xy[0] - mean_activity, xy[1]), num_parallel_calls = 8)
         .interleave(crop_to_224x224_and_flip, num_parallel_calls = 8)
         .shuffle(ds_train_size)
         .batch(256)
@@ -100,7 +116,7 @@ def reshape_and_concat(old_X, xy):
 
     return tf.concat((old_X, x), 0)
 
-X = ds_train.reduce(tf.zeros((0, 3), dtype = 'uint8'), reshape_and_concat)
+X = ds_train.reduce(tf.zeros((0, 3)), reshape_and_concat)
 
 X = tf.transpose(X)
 
@@ -124,7 +140,7 @@ def TrainingGenerator(ds, ds_size, batch_size, n_epochs):
 
                 delta = tf.matmul(U, alpha * s)
 
-                x = tf.cast(x, dtype = 'float32') + tf.transpose(delta)
+                x += tf.transpose(delta)
 
                 X[i] = x
 
