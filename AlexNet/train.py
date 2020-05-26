@@ -100,12 +100,15 @@ sum_rgb = ds_train.reduce(tf.zeros((3,)), reduce_sum)
 
 mean_activity = sum_rgb / ds_train_size
 
+def subtract_mean_activity(xy):
+    x, y = xy
+
+    return x - mean_activity, y
+
 ds_train = (
         ds_train
-        .map(lambda xy: (xy[0] - mean_activity, xy[1]), num_parallel_calls = 8)
+        .map(subtract_mean_activity, num_parallel_calls = 8)
         .interleave(crop_to_224x224_and_flip, num_parallel_calls = 8)
-        .shuffle(ds_train_size)
-        .batch(256)
         .prefetch(1024)
         )
 
@@ -154,8 +157,7 @@ ds_test = (
         ds['test']
         .map(to_xy, num_parallel_calls = 8)
         .map(resize_and_crop_to_256x256, num_parallel_calls = 8)
-        .shuffle(ds_info.splits['test'].num_examples)
-        .batch(256)
+        .map(subtract_mean_activity, num_parallel_calls = 8)
         .prefetch(1024)
         )
 
@@ -200,6 +202,10 @@ class AlexNet(Sequential):
 
     def predict_step(self, data):
         x, _ = data
+
+        x = tf.cast(x, dtype = 'float32')
+
+        x -= mean_activity
 
         return self._predict(x)
 
