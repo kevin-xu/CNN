@@ -27,6 +27,11 @@ from tensorflow.keras.callbacks import TensorBoard
 
 from tensorflow.keras import Model
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+
 imagenet2012_path = sys.argv[1]
 
 ds, ds_info = tfds.load(

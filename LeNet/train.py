@@ -5,6 +5,8 @@ import numpy as np
 
 import scipy as sp
 
+import tensorflow as tf
+
 from tensorflow.keras.datasets import mnist
 
 from tensorflow.keras.utils import to_categorical
@@ -21,6 +23,11 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Activation
 
 from tensorflow.keras.callbacks import TensorBoard
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 

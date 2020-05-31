@@ -7,6 +7,11 @@ import tensorflow as tf
 
 from tensorflow.keras.models import load_model
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+
 model = load_model('model.tf')
 
 x = tf.io.read_file('x.jpg')

@@ -9,6 +9,11 @@ from tensorflow.keras.models import load_model
 
 from tensorflow.keras.activations import tanh
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+
 model = load_model('model.h5', custom_objects = {'A': 1.7159, 'tanh': tanh})
 
 x = tf.io.read_file('x.jpg')
