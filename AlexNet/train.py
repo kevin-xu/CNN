@@ -167,6 +167,9 @@ ds_test = (
         )
 
 class AlexNet(Sequential):
+    def __init__(self):
+        super().__init__(self)
+
     def _predict(self, x):
         x0 = tf.image.crop_to_bounding_box(x, 16, 16, 224, 224)
         x1 = tf.image.crop_to_bounding_box(x, 0, 0, 224, 224)

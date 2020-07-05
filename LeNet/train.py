@@ -108,7 +108,7 @@ model.add(Activation('softmax'))
 
 model.compile(
         optimizer = 'SGD',
-        loss = 'categorical_crossentropy',
+        loss = 'sparse_categorical_crossentropy',
         metrics = ['accuracy'])
 
 log_dir = './logs/train/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
