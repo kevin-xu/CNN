@@ -3,10 +3,6 @@ import sys
 
 import datetime
 
-import numpy as np
-
-import scipy as sp
-
 import tensorflow as tf
 
 import tensorflow_datasets as tfds

@@ -1,8 +1,4 @@
 
-import numpy as np
-
-import scipy as sp
-
 import tensorflow as tf
 
 from tensorflow.keras.models import load_model
@@ -14,19 +10,26 @@ for gpu in gpus:
 
 model = load_model('model.tf')
 
-x = tf.io.read_file('x.jpg')
+assert tf.io.gfile.isdir('xs')
 
-x = tf.image.decode_jpeg(x, channels = 3)
+walk = tf.io.gfile.walk('xs')
 
-x = x.numpy()
+_, _, xns = next(walk)
 
-x = sp.ndimage.zoom(x, (256 / x.shape[0], 256 / x.shape[1], 1), order = 1)
+xs = []
 
-x = np.expand_dims(x, axis = 0)
+for x in xns:
+    x = tf.io.read_file('xs/' + x)
 
-y = model.predict(x, verbose = 1)
+    x = tf.image.decode_image(x, channels = 3)
 
-print(y)
+    xs.append(x)
 
-print(np.argmax(y))
+xs = tf.image.resize(xs, (256, 256), method = 'bilinear')
+
+ys = model.predict(xs, verbose = 1)
+
+print(ys)
+
+print(tf.argmax(ys, axis = 1))
 

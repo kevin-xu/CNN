@@ -1,10 +1,6 @@
 
 import datetime
 
-import numpy as np
-
-import scipy as sp
-
 import tensorflow as tf
 
 from tensorflow.keras.datasets import mnist
@@ -31,19 +27,19 @@ for gpu in gpus:
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-x_train = sp.ndimage.zoom(x_train, (1, 32 / 28, 32 / 28), order = 1)
+x_train = tf.expand_dims(x_train, axis = 3)
+
+x_train = tf.image.resize(x_train, (32, 32), method = 'bilinear')
 
 x_train = x_train / 255
 
-x_train = np.expand_dims(x_train, axis = 3)
-
 y_train = to_categorical(y_train, num_classes = 10)
 
-x_test = sp.ndimage.zoom(x_test, (1, 32 / 28, 32 / 28), order = 1)
+x_test = tf.expand_dims(x_test, axis = 3)
+
+x_test = tf.image.resize(x_test, (32, 32), method = 'bilinear')
 
 x_test = x_test / 255
-
-x_test = np.expand_dims(x_test, axis = 3)
 
 y_test = to_categorical(y_test, num_classes = 10)
 
@@ -108,7 +104,7 @@ model.add(Activation('softmax'))
 
 model.compile(
         optimizer = 'SGD',
-        loss = 'sparse_categorical_crossentropy',
+        loss = 'categorical_crossentropy',
         metrics = ['accuracy'])
 
 log_dir = './logs/train/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
