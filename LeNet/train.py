@@ -31,7 +31,7 @@ x_train = tf.expand_dims(x_train, axis = 3)
 
 x_train = tf.image.resize(x_train, (32, 32), method = 'bilinear')
 
-x_train = x_train / 255
+x_train /= 255
 
 y_train = to_categorical(y_train, num_classes = 10)
 
@@ -39,7 +39,7 @@ x_test = tf.expand_dims(x_test, axis = 3)
 
 x_test = tf.image.resize(x_test, (32, 32), method = 'bilinear')
 
-x_test = x_test / 255
+x_test /= 255
 
 y_test = to_categorical(y_test, num_classes = 10)
 
