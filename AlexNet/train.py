@@ -377,11 +377,7 @@ training_batch_size = 128
 training_n_epochs = 10
 
 model.fit(
-        x = TrainingGenerator(
-            ds_train,
-            ds_train_size,
-            training_batch_size,
-            training_n_epochs),
+        x = TrainingGenerator(ds_train, ds_train_size, training_batch_size, training_n_epochs),
         epochs = training_n_epochs,
         steps_per_epoch = ds_train_size / training_batch_size,
         verbose = 2,
