@@ -122,15 +122,15 @@ tensorboard_callback = TensorBoard(
 model.fit(
         x = x_train,
         y = y_train,
-        batch_size = 128,
-        epochs = 10,
+        batch_size = 32,
+        epochs = 100,
         verbose = 2,
         callbacks = [tensorboard_callback])
 
 score = model.evaluate(
         x = x_test,
         y = y_test,
-        batch_size = 128,
+        batch_size = 32,
         verbose = 2,
         callbacks = [tensorboard_callback],
         return_dict = True)
