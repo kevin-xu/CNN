@@ -361,7 +361,7 @@ model.compile(
 
 log_dir = './logs/train/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 
-tensorboard_callback = TensorBoard(
+tensorboard = TensorBoard(
         log_dir = log_dir,
         histogram_freq = 1,
         write_graph = True,
@@ -381,7 +381,7 @@ model.fit(
         epochs = training_n_epochs,
         steps_per_epoch = ds_train_size / training_batch_size,
         verbose = 2,
-        callbacks = [tensorboard_callback],
+        callbacks = [tensorboard],
         max_queue_size = 10,
         workers = 2,
         use_multiprocessing = True)
@@ -390,7 +390,7 @@ score = model.evaluate(
         x = ds_test,
         batch_size = 128,
         verbose = 2,
-        callbacks = [tensorboard_callback],
+        callbacks = [tensorboard],
         max_queue_size = 10,
         workers = 2,
         use_multiprocessing = True,

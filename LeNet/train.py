@@ -109,7 +109,7 @@ model.compile(
 
 log_dir = './logs/train/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
 
-tensorboard_callback = TensorBoard(
+tensorboard = TensorBoard(
         log_dir = log_dir,
         histogram_freq = 1,
         write_graph = True,
@@ -125,14 +125,14 @@ model.fit(
         batch_size = 32,
         epochs = 100,
         verbose = 2,
-        callbacks = [tensorboard_callback])
+        callbacks = [tensorboard])
 
 score = model.evaluate(
         x = x_test,
         y = y_test,
         batch_size = 32,
         verbose = 2,
-        callbacks = [tensorboard_callback],
+        callbacks = [tensorboard],
         return_dict = True)
 
 print(f'Test loss: {score["loss"]}')
